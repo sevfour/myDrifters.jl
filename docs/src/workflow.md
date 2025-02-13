@@ -22,9 +22,13 @@ summary(I.🔴)
 Plotting functions are provided in the `Makie.jl` extension, and operated via `DriftersDataset`.
 
 ```@example ex1
+using MeshArrays, GeoJSON
+fil=joinpath(MeshArrays.mydatadep("countries_geojson1"),"countries.geojson")
+pol=MeshArrays.read_polygons(fil);
+
 #prefix="real "; gdf=Drifters.groupby(P.obs,:ID)
 prefix="virtual "; gdf=Drifters.groupby(I.🔴,:ID)
-options=(plot_type="jcon_drifters",prefix=prefix,xlims=(-98,-78),ylims=(18,31),pol=P.pol)
+options=(plot_type="jcon_drifters",prefix=prefix,xlims=(-98,-78),ylims=(18,31),pol=pol)
 LoopC=DriftersDataset(  data=(gdf=gdf,), options=options )
 plot(LoopC)
 ```
