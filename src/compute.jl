@@ -161,6 +161,13 @@ function dxdt!(du::Array{T,1},u::Array{T,1},P::uvMeshArrays,tim) where T
 end
 
 """
+    location_is_out(u,nx,ny)
+
+Test if location `u` is outside the gridded domain (`0,nx`, `0,ny`).
+"""
+location_is_out(u,nx,ny) = (u[1]>nx)&&(u[1]<0)&&(u[2]>ny)&&(u[2]<0)
+
+"""
     dxdt!(du,u,P::uvwArrays,tim)
 
 Interpolate velocity from gridded fields (3D; NO halos) to position `u`
@@ -186,8 +193,15 @@ true
 function dxdt!(du::Array{T,1},u::Array{T,1},P::uvwArrays,tim) where T
     #compute positions in index units
     dt=mydt(tim,P.T)
-    #
     (nx,ny,nz) = size(P.u0)
+    #
+    while location_is_out(u,nx,ny)
+        u[1]=( u[1]>nx ? u[1]-nx : u[1] )
+        u[1]=( u[1]<0 ? u[1]+nx : u[1] )
+        u[2]=( u[2]>ny ? u[2]-ny : u[2] )
+        u[2]=( u[2]<0 ? u[2]+ny : u[2] )
+    end
+    #
     x=mod(u[1],nx)
     y=mod(u[2],ny)
     z=mod(u[3],nz)
@@ -258,8 +272,15 @@ true
 """
 function dxdt!(du::Array{T,1},u::Array{T,1},P::uvArrays,tim) where T
     dt=mydt(tim,P.T)
-    #
     (nx,ny) = size(P.u0)
+    #
+    while location_is_out(u,nx,ny)
+        u[1]=( u[1]>nx ? u[1]-nx : u[1] )
+        u[1]=( u[1]<0 ? u[1]+nx : u[1] )
+        u[2]=( u[2]>ny ? u[2]-ny : u[2] )
+        u[2]=( u[2]<0 ? u[2]+ny : u[2] )
+    end
+    #
     x=mod(u[1],nx)
     y=mod(u[2],ny)
     #
