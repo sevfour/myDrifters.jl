@@ -5,10 +5,10 @@ import Drifters: dxdt!, ∫!, update_FlowFields!, postprocess_xy
 
 using Glob, DataFrames, CSV, NetCDF
 
-n_part=100000
+n_part=1000
 reset_rate = 0.05 #per day
 dT=86400.0
-nt=360
+nt=30
 
 list_files(path="data",year=2021)=glob("oscar_currents_final_$(year)*.nc",path)
 
@@ -125,6 +125,17 @@ init(n_part,x1)=0.0.+x1*rand(n_part)
     main_loop(;  input_files=list_files(),
       output_file=joinpath("movies","oscar_v06.csv"), do_save=false)
 
+```
+using Drifters, GLMakie
+
+I=Drifters.Oscar.main_loop()
+
+using Proj, MeshArrays, GeoJSON
+lon0=-160.0; proj=Proj.Transformation(MA_preset=2,lon0=lon0)
+options=(plot_type=:Oscar_plot,proj=proj,lon0=-160,add_background=true,add_polygons=true)
+
+J=DriftersDataset( data=(df=I.🔴,), options=options)
+plot(J)
 """
 function main_loop(;  input_files=list_files(),
                       output_file=joinpath("movies","oscar_v06.csv"), 
@@ -160,6 +171,7 @@ end
 
 do_save ? CSV.write(output_file,II.🔴) : nothing
 
+II
 end
 
 end
