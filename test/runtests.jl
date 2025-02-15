@@ -16,6 +16,8 @@ MeshArrays.GridLoad(MeshArrays.GridSpec("PeriodicChannel",MeshArrays.GRID_LL360)
     J=DriftersDataset( data=(df=df,), options=(plot_type=:Oscar_plot,))
     fig=plot(J)
     @test isa(fig,Figure)
+    grid=Drifters.Oscar.grid()
+    @test isa(grid,NamedTuple)
 end
 
 @testset "ECCO" begin
