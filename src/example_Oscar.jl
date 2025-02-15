@@ -1,7 +1,7 @@
 module Oscar
 
 import Drifters: uvArrays, Individuals, FlowFields
-import Drifters: dxdt!, ∫!, update_FlowFields!, postprocess_xy
+import Drifters: dxdt!, ∫!, postprocess_xy
 
 using Glob, DataFrames, CSV, NetCDF
 
