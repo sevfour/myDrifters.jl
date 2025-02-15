@@ -175,14 +175,15 @@ function plot_start_end(I::Individuals)
 🔴_by_t = Drifters.DataFrames.groupby(I.🔴, :t)
 set_theme!(theme_light())
 fig=Figure(size = (900, 600))
-try
+ms=4
+if hasproperty(🔴_by_t[1],:lon)
 	a = Axis(fig[1, 1],xlabel="longitude",ylabel="latitude")		
-	scatter!(a,🔴_by_t[1].lon,🔴_by_t[1].lat,color=:green2)
-	scatter!(a,🔴_by_t[end].lon,🔴_by_t[end].lat,color=:red)
-catch
+	scatter!(a,🔴_by_t[1].lon,🔴_by_t[1].lat,color=:green2,markersize=ms)
+	scatter!(a,🔴_by_t[end].lon,🔴_by_t[end].lat,color=:red,markersize=ms)
+else
 	a = Axis(fig[1, 1],xlabel="longitude",ylabel="latitude")		
-	scatter!(a,🔴_by_t[1].x,🔴_by_t[1].y,color=:green2)
-	scatter!(a,🔴_by_t[end].x,🔴_by_t[end].y,color=:red)
+	scatter!(a,🔴_by_t[1].x,🔴_by_t[1].y,color=:green2,markersize=ms)
+	scatter!(a,🔴_by_t[end].x,🔴_by_t[end].y,color=:red,markersize=ms)
 end
 return fig
 end
