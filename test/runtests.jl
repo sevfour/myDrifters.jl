@@ -1,5 +1,6 @@
-using Test, Documenter, Drifters, Suppressor
-import Climatology, MeshArrays, NetCDF, MITgcm, CairoMakie
+using Test, Documenter, Drifters, Suppressor, CairoMakie
+import Climatology, MITgcm
+import Drifters: MeshArrays, NetCDF, CSV, DataFrames, JLD2
 
 Climatology.get_ecco_velocity_if_needed()
 Climatology.get_occa_velocity_if_needed()
@@ -8,6 +9,16 @@ Climatology.get_ecco_variable_if_needed("SALT")
 
 MeshArrays.GridLoad(MeshArrays.GridSpec("LatLonCap",MeshArrays.GRID_LLC90))
 MeshArrays.GridLoad(MeshArrays.GridSpec("PeriodicChannel",MeshArrays.GRID_LL360))
+
+@testset "Oscar" begin
+    fil=joinpath(Drifters.datadeps.getdata("Oscar_2021_small"),"Drifters_Oscar_small.csv")
+    df=CSV.read(fil,DataFrame)
+    J=DriftersDataset( data=(df=df,), options=(plot_type=:Oscar_plot,))
+    fig=plot(J)
+    @test isa(fig,Figure)
+    grid=Drifters.Oscar.grid()
+    @test isa(grid,NamedTuple)
+end
 
 @testset "ECCO" begin
     ECCOmodule = Drifters.ECCO
