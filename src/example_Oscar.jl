@@ -130,11 +130,21 @@ using Drifters, GLMakie
 
 I=Drifters.Oscar.main_loop()
 
+using CSV, DataFrames
+df=I.🔴
+(t0,t1)=extrema(unique(df.t)[end-30:end]);
+df=filter(:t => x -> (x >= t0)&&(x <= t1), df);
+df=filter(:ID => x -> (x <= 25000), df);
+CSV.write("Drifters_Oscar_small.csv",df)
+
 using Proj, MeshArrays, GeoJSON
 lon0=-160.0; proj=Proj.Transformation(MA_preset=2,lon0=lon0)
-options=(plot_type=:Oscar_plot,proj=proj,lon0=-160,add_background=true,add_polygons=true)
+options=(plot_type=:Oscar_plot,proj=proj,lon0=-160,
+  add_background=true,add_polygons=true,lon=df.lon,lat=df.lat,
+  color=86400*sqrt.(df.dxdt.^2 .+df.dydt.^2),
+  colorrange=(0,2),colormap=:thermal,markersize=2)
+J=DriftersDataset( data=(df=df,), options=options)
 
-J=DriftersDataset( data=(df=I.🔴,), options=options)
 plot(J)
 """
 function main_loop(;  input_files=list_files(),

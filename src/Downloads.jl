@@ -45,6 +45,10 @@ function __init__datadeps()
         ["https://zenodo.org/records/14229203/files/Drifters_example.jld2"],
         ["8c6ae8865821ac261316bfea3f31d1d362f210f806a85bfe5bb9775f3f91c2fa"],
         ))
+    register(DataDep("Oscar_2021_small","Sample output from Drifters.jl applied to Oscar data set",
+        ["https://zenodo.org/records/14876667/files/Drifters_Oscar_small.csv"],
+        ["d0eb67039ec77cacf88313c0827d9a591f2675aa485dbc97bee72123e4bba30a"],
+        ))
 end
 
 """
@@ -63,6 +67,8 @@ function getdata(nam::String)
             datadep"flt_example"
         elseif nam=="Gulf_of_Mexico"
             datadep"Gulf_of_Mexico"
+        elseif nam=="Oscar_2021_small"
+            datadep"Oscar_2021_small"
         else
             println("unknown dataset")
         end
