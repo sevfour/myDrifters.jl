@@ -249,8 +249,6 @@ function Oscar_plot(df=[]; plot_type="Oscar_plot", lon=[], lat=[],
 			color=:red, colormap=:thermal, colorrange=(0,10), markersize=0.5, 
 			add_background=false,add_polygons=false,
 			proj=[],lon0=0.0)
-
-	I_t=groupby(df,:t)
     
 	f = Figure(size=(1200,800))
 	ttl="Drifters.jl + Oscar model"
@@ -269,13 +267,18 @@ function Oscar_plot(df=[]; plot_type="Oscar_plot", lon=[], lat=[],
 	proj==[] ? nothing : MeshArrays.grid_lines!(pr_ax;color=:grey10,linewidth=0.5)
 		
 	if isa(lon,Observable)
-	  xy=@lift(proj.($lon,$lat))
-	  sc=scatter!(ax,xy,markersize=markersize,color=color,colormap=colormap,colorrange=colorrange)
-	  isa(color,Symbol) ? nothing : Colorbar(f[1,2], sc, height = Relative(0.5))
+		xy=@lift(proj.($lon,$lat))
+		sc=scatter!(ax,xy,markersize=markersize,color=color,colormap=colormap,colorrange=colorrange)
+		isa(color,Symbol) ? nothing : Colorbar(f[1,2], sc, height = Relative(0.5))
+	elseif !isempty(lon)
+		xy=proj.(lon,lat)
+		sc=scatter!(ax,xy,markersize=markersize,color=color,colormap=colormap,colorrange=colorrange)
+		isa(color,Symbol) ? nothing : Colorbar(f[1,2], sc, height = Relative(0.5))
 	else
-	  times=collect(1:length(I_t))
-	  [scatter!(pr_ax,I_t[t].lon,I_t[t].lat,color=:blue,markersize=1) for t in times]
-	  scatter!(pr_ax,I_t[times[1]].lon,I_t[times[1]].lat,markersize=2,color=:red)
+		I_t=groupby(df,:t)
+		times=collect(1:length(I_t))
+		[scatter!(pr_ax,I_t[t].lon,I_t[t].lat,color=:blue,markersize=1) for t in times]
+	  	scatter!(pr_ax,I_t[times[1]].lon,I_t[times[1]].lat,markersize=2,color=:red)
 	end
   
 	f

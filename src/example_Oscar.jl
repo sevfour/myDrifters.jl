@@ -56,10 +56,10 @@ function read_oscar(fil,G,dT)
   (O,P)
 end
 
-function update_FlowFields!(I::Individuals,G,dT,list)
+function update_FlowFields!(I::Individuals,G,dT,list; verbose=false)
   dT=I.P.T[2]-I.P.T[1]
   m0=Int(I.P.T[2]/dT)
-  println(m0)
+  verbose ? println(m0) : nothing
   _,P=read_oscar(list[m0],G,dT)
   I.P.u0.=P.u; I.P.v0.=P.v
   _,P=read_oscar(list[m0+1],G,dT)
@@ -139,7 +139,7 @@ plot(J)
 """
 function main_loop(;  input_files=list_files(),
                       output_file=joinpath("movies","oscar_v06.csv"), 
-                      do_save=false)
+                      do_save=false, verbose=false)
 
 ## initialize grid and flow fields
 
@@ -164,7 +164,7 @@ II=Individuals(FF,x0,y0,(🔧=custom🔧,🔴=custom🔴))
 update_FlowFields!(II,G,dT,input_files)
 for tt=1:nt
   ∫!(II)
-  update_FlowFields!(II,G,dT,input_files)
+  update_FlowFields!(II,G,dT,input_files,verbose=verbose)
   reset_📌!(II,reset_rate,📌)
 end
 #II_t=groupby(II.🔴,:t)
