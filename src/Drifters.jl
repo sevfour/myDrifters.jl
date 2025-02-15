@@ -12,9 +12,11 @@ include("data_wrangling.jl")
 include("toy_models.jl")
 include("initial_positions.jl")
 include("Downloads.jl")
+
 include("example_ECCO.jl")
 include("example_OCCA.jl")
 include("example_GOM.jl")
+include("example_Oscar.jl")
 
 export Individuals, ∫!, solve!, DataFrame, groupby
 export FlowFields, convert_to_FlowFields, to_C_grid!
