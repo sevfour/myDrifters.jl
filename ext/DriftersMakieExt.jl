@@ -1,7 +1,7 @@
 module DriftersMakieExt
 
 	using Makie, Drifters
-	import Drifters: DriftersDataset, DataFrame, demo, gcdist
+	import Drifters: DriftersDataset, DataFrame, demo, gcdist, MeshArrays
 	import Makie: plot
 
 	function plot(x::DriftersDataset)
@@ -17,6 +17,8 @@ module DriftersMakieExt
 				plot_start_end(x.data[:I])
 			elseif string(o.plot_type)=="jcon_drifters"
 				plot_drifters_jcon(x.data.gdf;x.options...)
+			elseif string(o.plot_type)=="Oscar_plot"
+				Oscar_plot(x.data.df;x.options...)
 			else
 				println("unknown option (b)")	
 			end
@@ -175,14 +177,15 @@ function plot_start_end(I::Individuals)
 🔴_by_t = Drifters.DataFrames.groupby(I.🔴, :t)
 set_theme!(theme_light())
 fig=Figure(size = (900, 600))
-try
+ms=4
+if hasproperty(🔴_by_t[1],:lon)
 	a = Axis(fig[1, 1],xlabel="longitude",ylabel="latitude")		
-	scatter!(a,🔴_by_t[1].lon,🔴_by_t[1].lat,color=:green2)
-	scatter!(a,🔴_by_t[end].lon,🔴_by_t[end].lat,color=:red)
-catch
+	scatter!(a,🔴_by_t[1].lon,🔴_by_t[1].lat,color=:green2,markersize=ms)
+	scatter!(a,🔴_by_t[end].lon,🔴_by_t[end].lat,color=:red,markersize=ms)
+else
 	a = Axis(fig[1, 1],xlabel="longitude",ylabel="latitude")		
-	scatter!(a,🔴_by_t[1].x,🔴_by_t[1].y,color=:green2)
-	scatter!(a,🔴_by_t[end].x,🔴_by_t[end].y,color=:red)
+	scatter!(a,🔴_by_t[1].x,🔴_by_t[1].y,color=:green2,markersize=ms)
+	scatter!(a,🔴_by_t[end].x,🔴_by_t[end].y,color=:red,markersize=ms)
 end
 return fig
 end
@@ -238,6 +241,64 @@ function plot_drifters_jcon(gdf ; 	plot_type="jcon_drifters", prefix="",pol=[],
 	Colorbar(fi0[1,2], colorrange=cr, colormap=cm, height = Relative(0.65))
 	
 	fi0
+end
+
+## Oscar example
+
+function Oscar_plot(df=[]; plot_type="Oscar_plot", lon=[], lat=[], 
+			color=:red, colormap=:thermal, colorrange=(0,10), markersize=0.5, 
+			add_background=false,add_polygons=false,
+			proj=[],lon0=0.0)
+    
+	f = Figure(size=(1200,800))
+	ttl="Drifters.jl + Oscar model"
+	ax = f[1, 1] = Axis(f, aspect = DataAspect(), title = ttl)
+	pr_ax = (proj==[] ? ax : MeshArrays.ProjAxis(ax; proj=proj,lon0=lon0))
+  
+	if add_background
+		BG=get_background()
+		surf = surface!(pr_ax,BG.lon,BG.lat,0*BG.lat; color=BG.DD,
+			  colorrange=BG.colorrange, colormap=BG.colormap, shading = NoShading)
+	end
+	if add_polygons
+		pol=read_pol()
+		lines!(pr_ax; polygons=pol,color=:black,linewidth=0.5)
+	end
+	proj==[] ? nothing : MeshArrays.grid_lines!(pr_ax;color=:grey10,linewidth=0.5)
+		
+	if isa(lon,Observable)
+		xy=@lift(proj.($lon,$lat))
+		sc=scatter!(ax,xy,markersize=markersize,color=color,colormap=colormap,colorrange=colorrange)
+		isa(color,Symbol) ? nothing : Colorbar(f[1,2], sc, height = Relative(0.5))
+	elseif !isempty(lon)
+		xy=proj.(lon,lat)
+		sc=scatter!(ax,xy,markersize=markersize,color=color,colormap=colormap,colorrange=colorrange)
+		isa(color,Symbol) ? nothing : Colorbar(f[1,2], sc, height = Relative(0.5))
+	else
+		I_t=groupby(df,:t)
+		times=collect(1:length(I_t))
+		[scatter!(pr_ax,I_t[t].lon,I_t[t].lat,color=:blue,markersize=1) for t in times]
+	  	scatter!(pr_ax,I_t[times[1]].lon,I_t[times[1]].lat,markersize=2,color=:red)
+	end
+  
+	f
+  end
+
+function get_background()
+	γ=MeshArrays.GridSpec(ID=:LLC90)
+	λ=MeshArrays.interpolation_setup()
+	hFacC=MeshArrays.GridLoadVar("hFacC",γ)
+	μ=MeshArrays.land_mask(hFacC[:,1])
+
+	Depth=MeshArrays.GridLoadVar("Depth",γ)
+	DD=MeshArrays.Interpolate(μ*Depth,λ.f,λ.i,λ.j,λ.w)
+	DD=reshape(DD,size(λ.lon))
+	(lon=λ.lon,lat=λ.lat,DD=DD,colorrange=[-6000.0,6000.0],colormap=:grays)
+end
+
+function read_pol()
+	fil=MeshArrays.demo.download_polygons("countries.geojson")
+	pol=MeshArrays.read_polygons(fil)
 end
 
 ##
