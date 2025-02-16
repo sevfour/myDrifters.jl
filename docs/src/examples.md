@@ -45,6 +45,14 @@ A simulation of particles that follow the three-dimensional ocean circulation. T
 
 The flow field is based on a data-constrained, realistic, ocean model. The problem configuration mimics, albeit very approximately, ocean tracers / coumpounds transported by water masses.
 
+## Gridded Satellite Data Products
+
+[notebook (html)](Oscar_model.html) ➭ [notebook (code)](https://github.com/JuliaClimate/Drifters.jl/blob/master/examples/worldwide/Oscar_model.jl)
+
+## Data Collected in the Field
+
+See the `User Guide` section.
+
 ## Additional Examples
 
 - Interactivity : [notebook (html)](interactive_UI.html) ➭ [notebook (code)](https://github.com/JuliaClimate/Drifters.jl/blob/master/examples/worldwide/interactive_UI.jl)
