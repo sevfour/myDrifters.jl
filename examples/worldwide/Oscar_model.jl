@@ -6,7 +6,7 @@ using InteractiveUtils
 
 # ╔═╡ f1498618-07d5-4892-9028-dabf977bff9b
 begin
-	using Drifters, GLMakie
+	using Drifters, CairoMakie
 	using Proj, MeshArrays, GeoJSON, PlutoUI, CSV, DataFrames
 	lon0=-160.0; proj=Proj.Transformation(MA_preset=2,lon0=lon0)
 	using Pkg; Pkg.status()
@@ -18,34 +18,8 @@ md"""# Drifters.jl + Oscar Data Assimilative Model
 - Oscar provides daily averaged surface currents are provided on a global 0.25 x 0.25 degree grid.
 - Drifters.jl is used to compute trajectories of virtual floating parcels following Oscar flow fields.
 
-## Software : Drifters.jl (v0.6.4)
-
-Forget, G., (2021). IndividualDisplacements.jl: a Julia package to simulate and study particle displacements within the climate system. Journal of Open Source Software, 6(60), 2813, <https://doi.org/10.21105/joss.02813>
-
-<https://github.com/JuliaClimate/Drifters.jl>
-
-## Data : Oscar (v2.0)
-
-ESR; Dohan, Kathleen. 2022. Ocean Surface Current Analyses Real-time (OSCAR) Surface Currents - Final 0.25 Degree (Version 2.0). Ver. 2.0. PO.DAAC, CA, USA. Dataset accessed [YYYY-MM-DD] at https://doi.org/10.5067/OSCAR-25F20
- 
-<https://podaac.jpl.nasa.gov/dataset/OSCAR_L4_OC_FINAL_V2.0>
-  
-#### Sample NetCDF Granule
-
-<https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-protected/OSCAR_L4_OC_FINAL_V2.0/oscar_currents_final_20220504.nc>
-
-#### Download Files
-
-In shell : 
-
-```
-podaac-data-downloader -c OSCAR_L4_OC_FINAL_V2.0 -d ./data --start-date 2021-01-01T00:00:00Z --end-date 2021-02-01T00:00:00Z -e ""
-```
-
-#### Additional Information
-
-- <https://github.com/podaac/data-subscriber>
-- <https://podaac.jpl.nasa.gov/dataset/OSCAR_L4_OC_FINAL_V2.0#capability-modal-download>
+!!! note
+    See Appendix for more information on software and data.
 """
 
 # ╔═╡ e278df98-196b-4f05-a4e1-010b287d221f
@@ -87,7 +61,7 @@ end
 md"""## Compute New Trajectories
 
 !!! warning
-    Recomputing trajectories requires data to be downloaded to the `input_path` folder.
+    Recomputing trajectories requires Oscar data to have been downloaded to the `input_path` folder.
 """
 
 # ╔═╡ a8ddb075-73cf-4496-a8a5-4f824a5f80d6
@@ -109,15 +83,49 @@ end
 isempty(input_files) ? nothing : plot(J)
 
 # ╔═╡ 24ecbc7b-b0f2-4ebe-9ac4-1a827254f225
-md"""## Appendix"""
+md"""## Appendix
+
+### Julia Packages
+"""
+
+# ╔═╡ 1f479c36-f021-464c-a279-0d62a1f33359
+md"""### Software : Drifters.jl (v0.6.4)
+
+Forget, G., (2021). IndividualDisplacements.jl: a Julia package to simulate and study particle displacements within the climate system. Journal of Open Source Software, 6(60), 2813, <https://doi.org/10.21105/joss.02813>
+
+<https://github.com/JuliaClimate/Drifters.jl>
+
+### Data : Oscar (v2.0)
+
+ESR; Dohan, Kathleen. 2022. Ocean Surface Current Analyses Real-time (OSCAR) Surface Currents - Final 0.25 Degree (Version 2.0). Ver. 2.0. PO.DAAC, CA, USA. Dataset accessed [YYYY-MM-DD] at https://doi.org/10.5067/OSCAR-25F20
+ 
+<https://podaac.jpl.nasa.gov/dataset/OSCAR_L4_OC_FINAL_V2.0>
+  
+#### Sample NetCDF Granule
+
+<https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-protected/OSCAR_L4_OC_FINAL_V2.0/oscar_currents_final_20220504.nc>
+
+#### Download Files
+
+In shell : 
+
+```
+podaac-data-downloader -c OSCAR_L4_OC_FINAL_V2.0 -d ./data --start-date 2021-01-01T00:00:00Z --end-date 2021-02-01T00:00:00Z -e ""
+```
+
+#### Additional Information
+
+- <https://github.com/podaac/data-subscriber>
+- <https://podaac.jpl.nasa.gov/dataset/OSCAR_L4_OC_FINAL_V2.0#capability-modal-download>
+"""
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
+CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 Drifters = "bd752fb7-3f37-44cb-a8fb-f461137b623f"
-GLMakie = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
 GeoJSON = "61d90e0f-e114-555e-ac52-39dfb47a3ef9"
 MeshArrays = "cb8c808f-1acf-59a3-9d2b-6e38d009f683"
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
@@ -128,7 +136,6 @@ Proj = "c94c279d-25a6-4763-9509-64d165bea63e"
 CSV = "~0.10.15"
 DataFrames = "~1.7.0"
 Drifters = "~0.6.1"
-GLMakie = "~0.11.2"
 GeoJSON = "~0.8.2"
 MeshArrays = "~0.3.20"
 PlutoUI = "~0.7.61"
@@ -141,7 +148,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.11.3"
 manifest_format = "2.0"
-project_hash = "30801ba4641e89b8adfd4aeca941cfb07bf5cf49"
+project_hash = "f67f11c947b85495e2c7b9379833acb0734bf19a"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "fb97701c117c8162e84dfcf80215caa904aef44f"
@@ -366,6 +373,18 @@ git-tree-sha1 = "deddd8725e5e1cc49ee205a1964256043720a6c3"
 uuid = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 version = "0.10.15"
 
+[[deps.Cairo]]
+deps = ["Cairo_jll", "Colors", "Glib_jll", "Graphics", "Libdl", "Pango_jll"]
+git-tree-sha1 = "71aa551c5c33f1a4415867fe06b7844faadb0ae9"
+uuid = "159f3aea-2a34-519c-b102-8c37f9878175"
+version = "1.1.1"
+
+[[deps.CairoMakie]]
+deps = ["CRC32c", "Cairo", "Cairo_jll", "Colors", "FileIO", "FreeType", "GeometryBasics", "LinearAlgebra", "Makie", "PrecompileTools"]
+git-tree-sha1 = "6d76f05dbc8b7a52deaa7cdabe901735ae7b6724"
+uuid = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
+version = "0.13.1"
+
 [[deps.Cairo_jll]]
 deps = ["Artifacts", "Bzip2_jll", "CompilerSupportLibraries_jll", "Fontconfig_jll", "FreeType2_jll", "Glib_jll", "JLLWrappers", "LZO_jll", "Libdl", "Pixman_jll", "Xorg_libXext_jll", "Xorg_libXrender_jll", "Zlib_jll", "libpng_jll"]
 git-tree-sha1 = "009060c9a6168704143100f36ab08f06c2af4642"
@@ -570,12 +589,6 @@ deps = ["Printf"]
 uuid = "ade2ca70-3891-5945-98fb-dc099432e06a"
 version = "1.11.0"
 
-[[deps.Dbus_jll]]
-deps = ["Artifacts", "Expat_jll", "JLLWrappers", "Libdl"]
-git-tree-sha1 = "fc173b380865f70627d7dd1190dc2fce6cc105af"
-uuid = "ee1fde0b-3d02-5ea6-8484-8dfef6360eab"
-version = "1.14.10+0"
-
 [[deps.DelaunayTriangulation]]
 deps = ["AdaptivePredicates", "EnumX", "ExactPredicates", "Random"]
 git-tree-sha1 = "5620ff4ee0084a6ab7097a27ba0c19290200b037"
@@ -762,12 +775,6 @@ weakdeps = ["Adapt"]
 
     [deps.EnzymeCore.extensions]
     AdaptExt = "Adapt"
-
-[[deps.EpollShim_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl"]
-git-tree-sha1 = "8a4be429317c42cfae6a7fc03c31bad1970c310d"
-uuid = "2702e6a9-849d-5ed8-8c21-79e8b8f9ee43"
-version = "0.0.20230411+1"
 
 [[deps.ExactPredicates]]
 deps = ["IntervalArithmetic", "Random", "StaticArrays"]
@@ -997,24 +1004,6 @@ deps = ["Random"]
 uuid = "9fa8497b-333b-5362-9e8d-4d0656e87820"
 version = "1.11.0"
 
-[[deps.GLFW]]
-deps = ["GLFW_jll"]
-git-tree-sha1 = "7ed24cfc4cb29fb10c0e8cca871ddff54c32a4c3"
-uuid = "f7f18e0c-5ee9-5ccd-a5bf-e8befd85ed98"
-version = "3.4.3"
-
-[[deps.GLFW_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl", "Libglvnd_jll", "Xorg_libXcursor_jll", "Xorg_libXi_jll", "Xorg_libXinerama_jll", "Xorg_libXrandr_jll", "libdecor_jll", "xkbcommon_jll"]
-git-tree-sha1 = "fcb0584ff34e25155876418979d4c8971243bb89"
-uuid = "0656b61e-2033-5cc2-a64a-77c0f6c09b89"
-version = "3.4.0+2"
-
-[[deps.GLMakie]]
-deps = ["ColorTypes", "Colors", "FileIO", "FixedPointNumbers", "FreeTypeAbstraction", "GLFW", "GeometryBasics", "LinearAlgebra", "Makie", "Markdown", "MeshIO", "ModernGL", "Observables", "PrecompileTools", "Printf", "ShaderAbstractions", "StaticArrays"]
-git-tree-sha1 = "487ffeede54553565023a107529434ff585060ae"
-uuid = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
-version = "0.11.2"
-
 [[deps.GPUArraysCore]]
 deps = ["Adapt"]
 git-tree-sha1 = "83cf05ab16a73219e5f6bd1bdfa9848fa24ac627"
@@ -1088,6 +1077,12 @@ version = "2.82.4+0"
 git-tree-sha1 = "97285bbd5230dd766e9ef6749b80fc617126d496"
 uuid = "c27321d9-0574-5035-807b-f59d2c89b15c"
 version = "1.3.1"
+
+[[deps.Graphics]]
+deps = ["Colors", "LinearAlgebra", "NaNMath"]
+git-tree-sha1 = "a641238db938fff9b2f60d08ed9030387daf428c"
+uuid = "a2bd30eb-e257-5431-a919-1863eab51364"
+version = "1.1.3"
 
 [[deps.Graphite2_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -1717,12 +1712,6 @@ version = "0.3.20"
     Proj = "c94c279d-25a6-4763-9509-64d165bea63e"
     Shapefile = "8e980c4a-a4fe-5da2-b3a7-4b4b0353a2f4"
 
-[[deps.MeshIO]]
-deps = ["ColorTypes", "FileIO", "GeometryBasics", "Printf"]
-git-tree-sha1 = "0644638417afafeceab065fc96ba5590538f966f"
-uuid = "7269a6da-0436-5bbc-96c2-40638cbb6118"
-version = "0.5.2"
-
 [[deps.MicrosoftMPI_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
 git-tree-sha1 = "bc95bf4149bf535c09602e3acdf950d9b4376227"
@@ -1738,12 +1727,6 @@ version = "1.2.0"
 [[deps.Mmap]]
 uuid = "a63ad114-7e13-5084-954f-fe012c677804"
 version = "1.11.0"
-
-[[deps.ModernGL]]
-deps = ["Libdl"]
-git-tree-sha1 = "ac6cb1d8807a05cf1acc9680e09d2294f9d33956"
-uuid = "66fc600b-dfda-50eb-8b99-91cfa97b1301"
-version = "1.1.8"
 
 [[deps.MosaicViews]]
 deps = ["MappedArrays", "OffsetArrays", "PaddedViews", "StackViews"]
@@ -2894,18 +2877,6 @@ git-tree-sha1 = "8351f8d73d7e880bfc042a8b6922684ebeafb35c"
 uuid = "19fa3120-7c27-5ec5-8db8-b0b0aa330d6f"
 version = "0.2.0"
 
-[[deps.Wayland_jll]]
-deps = ["Artifacts", "EpollShim_jll", "Expat_jll", "JLLWrappers", "Libdl", "Libffi_jll", "Pkg", "XML2_jll"]
-git-tree-sha1 = "85c7811eddec9e7f22615371c3cc81a504c508ee"
-uuid = "a2964d1f-97da-50d4-b82a-358c7fce9d89"
-version = "1.21.0+2"
-
-[[deps.Wayland_protocols_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
-git-tree-sha1 = "5db3e9d307d32baba7067b13fc7b5aa6edd4a19a"
-uuid = "2381bf8a-dfd0-557d-9999-79630e7b1b91"
-version = "1.36.0+0"
-
 [[deps.WeakRefStrings]]
 deps = ["DataAPI", "InlineStrings", "Parsers"]
 git-tree-sha1 = "b1be2855ed9ed8eac54e5caff2afcdb442d52c23"
@@ -2959,12 +2930,6 @@ git-tree-sha1 = "e9216fdcd8514b7072b43653874fd688e4c6c003"
 uuid = "0c0b7dd1-d40b-584c-a123-a41640f87eec"
 version = "1.0.12+0"
 
-[[deps.Xorg_libXcursor_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libXfixes_jll", "Xorg_libXrender_jll"]
-git-tree-sha1 = "807c226eaf3651e7b2c468f687ac788291f9a89b"
-uuid = "935fb764-8cf2-53bf-bb30-45bb1f8bf724"
-version = "1.2.3+0"
-
 [[deps.Xorg_libXdmcp_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
 git-tree-sha1 = "89799ae67c17caa5b3b5a19b8469eeee474377db"
@@ -2976,30 +2941,6 @@ deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libX11_jll"]
 git-tree-sha1 = "d7155fea91a4123ef59f42c4afb5ab3b4ca95058"
 uuid = "1082639a-0dae-5f34-9b06-72781eeb8cb3"
 version = "1.3.6+3"
-
-[[deps.Xorg_libXfixes_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libX11_jll"]
-git-tree-sha1 = "6fcc21d5aea1a0b7cce6cab3e62246abd1949b86"
-uuid = "d091e8ba-531a-589c-9de9-94069b037ed8"
-version = "6.0.0+0"
-
-[[deps.Xorg_libXi_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libXext_jll", "Xorg_libXfixes_jll"]
-git-tree-sha1 = "984b313b049c89739075b8e2a94407076de17449"
-uuid = "a51aa0fd-4e3c-5386-b890-e753decda492"
-version = "1.8.2+0"
-
-[[deps.Xorg_libXinerama_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libXext_jll"]
-git-tree-sha1 = "a1a7eaf6c3b5b05cb903e35e8372049b107ac729"
-uuid = "d1454406-59df-5ea1-beac-c340f2130bc3"
-version = "1.1.5+0"
-
-[[deps.Xorg_libXrandr_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libXext_jll", "Xorg_libXrender_jll"]
-git-tree-sha1 = "b6f664b7b2f6a39689d822a6300b14df4668f0f4"
-uuid = "ec84b674-ba8e-5d96-8ba1-2a689ba10484"
-version = "1.5.4+0"
 
 [[deps.Xorg_libXrender_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libX11_jll"]
@@ -3018,24 +2959,6 @@ deps = ["Artifacts", "JLLWrappers", "Libdl", "XSLT_jll", "Xorg_libXau_jll", "Xor
 git-tree-sha1 = "1a74296303b6524a0472a8cb12d3d87a78eb3612"
 uuid = "c7cfdc94-dc32-55de-ac96-5a1b8d977c5b"
 version = "1.17.0+3"
-
-[[deps.Xorg_libxkbfile_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libX11_jll"]
-git-tree-sha1 = "dbc53e4cf7701c6c7047c51e17d6e64df55dca94"
-uuid = "cc61e674-0454-545c-8b26-ed2c68acab7a"
-version = "1.1.2+1"
-
-[[deps.Xorg_xkbcomp_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libxkbfile_jll"]
-git-tree-sha1 = "ab2221d309eda71020cdda67a973aa582aa85d69"
-uuid = "35661453-b289-5fab-8a00-3d9160c6a3a4"
-version = "1.4.6+1"
-
-[[deps.Xorg_xkeyboard_config_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_xkbcomp_jll"]
-git-tree-sha1 = "691634e5453ad362044e2ad653e79f3ee3bb98c3"
-uuid = "33bec58e-1273-512f-9401-5d533626f822"
-version = "2.39.0+0"
 
 [[deps.Xorg_xtrans_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
@@ -3088,12 +3011,6 @@ version = "0.15.2+0"
 deps = ["Artifacts", "Libdl"]
 uuid = "8e850b90-86db-534c-a0d3-1478176c7d93"
 version = "5.11.0+0"
-
-[[deps.libdecor_jll]]
-deps = ["Artifacts", "Dbus_jll", "JLLWrappers", "Libdl", "Libglvnd_jll", "Pango_jll", "Wayland_jll", "xkbcommon_jll"]
-git-tree-sha1 = "9bf7903af251d2050b467f76bdbe57ce541f7f4f"
-uuid = "1183f4f0-6f2a-5f1a-908b-139f9cdfea6f"
-version = "0.2.2+0"
 
 [[deps.libfdk_aac_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
@@ -3158,12 +3075,6 @@ deps = ["Artifacts", "JLLWrappers", "Libdl"]
 git-tree-sha1 = "dcc541bb19ed5b0ede95581fb2e41ecf179527d2"
 uuid = "dfaa095f-4041-5dcd-9319-2fabd8486b76"
 version = "3.6.0+0"
-
-[[deps.xkbcommon_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "Wayland_jll", "Wayland_protocols_jll", "Xorg_libxcb_jll", "Xorg_xkeyboard_config_jll"]
-git-tree-sha1 = "63406453ed9b33a0df95d570816d5366c92b7809"
-uuid = "d8fb68d0-12a3-5cfd-a85a-d49703b185fd"
-version = "1.4.1+2"
 """
 
 # ╔═╡ Cell order:
@@ -3178,6 +3089,7 @@ version = "1.4.1+2"
 # ╠═dd7f5d46-6479-4612-a6a4-2fedca50b1a8
 # ╠═2a360d87-29c9-44f8-a467-f2648ce53948
 # ╟─24ecbc7b-b0f2-4ebe-9ac4-1a827254f225
-# ╠═f1498618-07d5-4892-9028-dabf977bff9b
+# ╟─f1498618-07d5-4892-9028-dabf977bff9b
+# ╠═1f479c36-f021-464c-a279-0d62a1f33359
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
