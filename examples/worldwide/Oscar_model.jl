@@ -13,7 +13,10 @@ begin
 end
 
 # ╔═╡ 39055364-6654-42dd-afad-9e67f286f054
-md"""# Drifters.jl + Oscar model
+md"""# Drifters.jl + Oscar Data Assimilative Model
+
+- Oscar provides daily averaged surface currents are provided on a global 0.25 x 0.25 degree grid.
+- Drifters.jl is used to compute trajectories of virtual floating parcels following Oscar flow fields.
 
 ## Software : Drifters.jl (v0.6.4)
 
@@ -26,9 +29,7 @@ Forget, G., (2021). IndividualDisplacements.jl: a Julia package to simulate and 
 ESR; Dohan, Kathleen. 2022. Ocean Surface Current Analyses Real-time (OSCAR) Surface Currents - Final 0.25 Degree (Version 2.0). Ver. 2.0. PO.DAAC, CA, USA. Dataset accessed [YYYY-MM-DD] at https://doi.org/10.5067/OSCAR-25F20
  
 <https://podaac.jpl.nasa.gov/dataset/OSCAR_L4_OC_FINAL_V2.0>
- 
-Provides daily averaged surface currents are provided on a global 0.25 x 0.25 degree grid.
- 
+  
 #### Sample NetCDF Granule
 
 <https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-protected/OSCAR_L4_OC_FINAL_V2.0/oscar_currents_final_20220504.nc>
