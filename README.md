@@ -24,7 +24,9 @@ Pkg.test("Drifters")
 
 ### Examples
 
-The movies highlighted above are from the [Global Climatology](https://juliaclimate.github.io/Drifters.jl/dev/examples/global_ocean_circulation.html) and [Three Dimensional](https://juliaclimate.github.io/Drifters.jl/dev/examples/three_dimensional_ocean.html) examples. The basic examples shown below are from the [Simple 3-D Flow](https://juliaclimate.github.io/Drifters.jl/dev/examples/solid_body_rotation.html) and [Simple 2-D Flow](https://juliaclimate.github.io/Drifters.jl/dev/examples/random_flow_field.html) notebooks. For more, please report to [the docs](https://JuliaClimate.github.io/Drifters.jl/dev).
+The movies highlighted above are based on the [Global Climatology](https://juliaclimate.github.io/Drifters.jl/dev/examples/global_ocean_circulation.html) and [Three Dimensional](https://juliaclimate.github.io/Drifters.jl/dev/examples/three_dimensional_ocean.html) examples. 
+
+The basic examples shown below are from the [Simple 3-D Flow](https://juliaclimate.github.io/Drifters.jl/dev/examples/solid_body_rotation.html) and [Simple 2-D Flow](https://juliaclimate.github.io/Drifters.jl/dev/examples/random_flow_field.html) notebooks. For more, please report to [the docs](https://JuliaClimate.github.io/Drifters.jl/dev).
 
 [<img src="https://user-images.githubusercontent.com/20276764/84766999-b801ad80-af9f-11ea-922a-610ad8a257dc.png"  width="45%">](https://www.youtube.com/watch?v=W5DNqJG9jt0) <img src="https://user-images.githubusercontent.com/20276764/94491485-595ee900-01b6-11eb-95e6-c2cacb812f46.png" width="30%"> 
 
