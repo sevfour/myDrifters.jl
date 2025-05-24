@@ -5,9 +5,6 @@ import Drifters: dxdt!, ∫!, postprocess_xy
 
 using Glob, DataFrames, CSV, NetCDF
 
-# n_part=1000
-# reset_rate = 0.05 #per day
-# nt=30
 dT=86400.0
 
 list_files(path="data",year=2021)=glob("oscar_currents_final_$(year)*.nc",path)
@@ -96,8 +93,6 @@ function custom🔧(sol,F::uvArrays,D::NamedTuple;id=missing,T=missing)
   return df
 end
 
-# custom🔴 = DataFrame(ID=Int[], x=Float32[], y=Float32[], t=Float32[], lon=Float32[], lat=Float32[], dxdt=Float32[], dydt=Float32[])
-
 ## grid factors and flow fields normalization
 
 grid()=begin
@@ -148,7 +143,8 @@ J=DriftersDataset( data=(df=df,), options=options)
 plot(J)
 """
 function main_loop(;  input_files=list_files(),
-                      output_file=joinpath("movies","oscar_v06.csv"), n_part=10000, reset_rate=0.05, nt=30, 
+                      output_file=joinpath("movies","oscar_v06.csv"), 
+                      n_part=10000, reset_rate=0.05, nt=30, 
                       do_save=false, verbose=false)
 
 ## initialize grid and flow fields
