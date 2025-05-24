@@ -110,8 +110,8 @@ end
 if do_compute && !isempty(input_files)
 	nt=30; output_file=tempname()*"_oscar.csv"
 
-	I=Drifters.Oscar.main_loop(input_files=input_files, do_save=true, output_file=output_file)
-#		   n_part=10000, reset_rate=0.05, nt=nt, verbose=true) #requires upcoming v0.6.6
+	I=Drifters.Oscar.main_loop(input_files=input_files, do_save=true, output_file=output_file,
+			n_part=10000, reset_rate=0.05, nt=nt, verbose=true) #requires upcoming v0.6.6
 
 	println(output_file)
 	println(Int.(round.(extrema(unique(I.🔴.t))./86400)))
@@ -803,9 +803,9 @@ version = "1.6.0"
 
 [[deps.Drifters]]
 deps = ["CSV", "CyclicArrays", "DataDeps", "DataFrames", "Dataverse", "Glob", "JLD2", "MeshArrays", "NetCDF", "OrdinaryDiffEq", "Random"]
-git-tree-sha1 = "8fec22a115b8c0164867ef37d84eac7032408753"
+git-tree-sha1 = "add091be267776805c0f118acdb09587977c9c96"
 uuid = "bd752fb7-3f37-44cb-a8fb-f461137b623f"
-version = "0.6.5"
+version = "0.6.6"
 
     [deps.Drifters.extensions]
     DriftersClimatologyExt = ["Climatology"]
