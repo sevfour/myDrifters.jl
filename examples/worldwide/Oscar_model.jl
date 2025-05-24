@@ -108,9 +108,14 @@ end
 
 # ╔═╡ dd7f5d46-6479-4612-a6a4-2fedca50b1a8
 if do_compute && !isempty(input_files)
-	nt=30
-	I=Drifters.Oscar.main_loop(input_files=input_files, do_save=false, verbose=true)
+	nt=30; output_file=tempname()*"_oscar.csv"
+
+	I=Drifters.Oscar.main_loop(input_files=input_files, do_save=true, output_file=output_file)
 #		   n_part=10000, reset_rate=0.05, nt=nt, verbose=true) #requires upcoming v0.6.6
+
+	println(output_file)
+	println(Int.(round.(extrema(unique(I.🔴.t))./86400)))
+
 	O=(plot_type=:Oscar_plot,proj=proj,lon0=-160,add_background=true,
 		   add_polygons=true, markersize=2)
 	K=DriftersDataset( data=(df=I.🔴,), options=O);

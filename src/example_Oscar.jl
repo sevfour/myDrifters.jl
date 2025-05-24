@@ -142,10 +142,9 @@ J=DriftersDataset( data=(df=df,), options=options)
 
 plot(J)
 """
-function main_loop(;  input_files=list_files(),
-                      output_file=joinpath("movies","oscar_v06.csv"), 
-                      n_part=10000, reset_rate=0.05, nt=30, 
-                      do_save=false, verbose=false)
+function main_loop(;  input_files=list_files(), verbose=false,
+                      do_save=false, output_file=tempname()*"_oscar.csv", 
+                      n_part=10000, reset_rate=0.05, nt=30)
 
 ## initialize grid and flow fields
 
