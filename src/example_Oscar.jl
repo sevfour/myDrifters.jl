@@ -5,10 +5,10 @@ import Drifters: dxdt!, ∫!, postprocess_xy
 
 using Glob, DataFrames, CSV, NetCDF
 
-n_part=1000
-reset_rate = 0.05 #per day
+# n_part=1000
+# reset_rate = 0.05 #per day
+# nt=30
 dT=86400.0
-nt=30
 
 list_files(path="data",year=2021)=glob("oscar_currents_final_$(year)*.nc",path)
 
@@ -96,7 +96,7 @@ function custom🔧(sol,F::uvArrays,D::NamedTuple;id=missing,T=missing)
   return df
 end
 
-custom🔴 = DataFrame(ID=Int[], x=Float32[], y=Float32[], t=Float32[], lon=Float32[], lat=Float32[], dxdt=Float32[], dydt=Float32[])
+# custom🔴 = DataFrame(ID=Int[], x=Float32[], y=Float32[], t=Float32[], lon=Float32[], lat=Float32[], dxdt=Float32[], dydt=Float32[])
 
 ## grid factors and flow fields normalization
 
@@ -148,7 +148,7 @@ J=DriftersDataset( data=(df=df,), options=options)
 plot(J)
 """
 function main_loop(;  input_files=list_files(),
-                      output_file=joinpath("movies","oscar_v06.csv"), 
+                      output_file=joinpath("movies","oscar_v06.csv"), n_part=10000, reset_rate=0.05, nt=30, 
                       do_save=false, verbose=false)
 
 ## initialize grid and flow fields
@@ -170,12 +170,13 @@ y0=y0[findall(v0.>0)[1:n_part]]
 ## solve
 
 FF=uvArrays{Float64}(zeros(siz),zeros(siz),zeros(siz),zeros(siz),P.T)
+custom🔴 = DataFrame(ID=Int[], x=Float32[], y=Float32[], t=Float32[], lon=Float32[], lat=Float32[], dxdt=Float32[], dydt=Float32[])
 II=Individuals(FF,x0,y0,(🔧=custom🔧,🔴=custom🔴))
-update_FlowFields!(II,G,dT,input_files)
+update_FlowFields!(II,G,dT,input_files,verbose=verbose)
 for tt=1:nt
   ∫!(II)
   update_FlowFields!(II,G,dT,input_files,verbose=verbose)
-  reset_📌!(II,reset_rate,📌)
+  reset_rate>0 ? reset_📌!(II,reset_rate,📌) : nothing
 end
 #II_t=groupby(II.🔴,:t)
 
