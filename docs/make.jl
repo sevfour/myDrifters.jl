@@ -1,4 +1,7 @@
 using Documenter, Literate, PlutoSliderServer, Drifters
+
+import MITgcm; MITgcm.getdata("mitgcmsmall")
+
 using Climatology
 
 #download data dependencies if needed
