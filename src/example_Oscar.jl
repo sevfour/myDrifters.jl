@@ -108,7 +108,7 @@ grid()=begin
   dxF = rSphere*deg2rad.(cosd.(yc)*0.25)
   dyF = rSphere*deg2rad.(diff(yg))
   x=sind.(yg[2:end])-sind.(yg[1:end-1])
-  RAC = rSphere*rSphere*1.0*deg2rad.(abs.(x))
+  RAC = rSphere*rSphere*0.25*deg2rad.(abs.(x))
 
   (
     XC=xc*ones(1,length(yc)),
