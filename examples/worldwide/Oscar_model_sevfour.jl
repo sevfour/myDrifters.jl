@@ -4,23 +4,7 @@
 using Markdown
 using InteractiveUtils
 
-# This Pluto notebook uses @bind for interactivity. When running this notebook outside of Pluto, the following 'mock version' of @bind gives bound variables a default value (instead of an error).
-macro bind(def, element)
-    #! format: off
-    return quote
-        local iv = try Base.loaded_modules[Base.PkgId(Base.UUID("6e696c72-6542-2067-7265-42206c756150"), "AbstractPlutoDingetjes")].Bonds.initial_value catch; b -> missing; end
-        local el = $(esc(element))
-        global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : iv(el)
-        el
-    end
-    #! format: on
-end
-
 # ╔═╡ f1498618-07d5-4892-9028-dabf977bff9b
-# Needed to reinstall Drifters new version in julia's terminal:
-# using Pkg
-# Pkg.add("Drifters")
-# Pkg.test("Drifters")
 begin
 	using Drifters, CairoMakie
 	using Proj, MeshArrays, GeoJSON, PlutoUI, CSV, DataFrames
@@ -36,102 +20,45 @@ md"""# Drifters.jl + Oscar Data Assimilative Model
 
 !!! note
     See Appendix for more information on software and data.
+
+!!! note
+    See Oscar_model.jl.
 """
-
-# ╔═╡ e278df98-196b-4f05-a4e1-010b287d221f
-TableOfContents()
-
-# ╔═╡ 5e4f26a0-8954-44b7-a3cb-224197a2e0cb
-md"""## Visualize Precomputed Data
-
-- 30 days of precomputed trajectory data are retrieved from a `csv` file.
-- the file contains daily time series of positions and normalized velocities.
-- 50000 virtual parcels were initially released the time varying Oscar flow fields.
-- the parcel trajectories were then computed using Drifters.jl (code provided below).
-"""
-
-# ╔═╡ d6bd64ce-ebd3-11ef-3ea6-c77f6094d0a6
-file_precomputed=joinpath(Drifters.datadeps.getdata("Oscar_2021_small"),"Drifters_Oscar_small.csv")
-
-# ╔═╡ 1dc43b12-c49f-4ab5-a239-9188d8452659
-df=CSV.read(file_precomputed,DataFrame)
-
-# ╔═╡ cc50a353-adb7-4f7c-a707-272045f3fb80
-#I didn't have the ECCO grid files, need to download them
-# begin
-# 	MeshArrays.GRID_LLC90_download()
-# 	readdir(MeshArrays.GRID_LLC90)
-# end
-
-# ╔═╡ 9824e0ef-5d69-49fc-a2cc-b41f010c8627
-# The CSV file contains the lagrangian calculation already done on 1 year, only the last month is saved -> that is done in src/example_Oscar.jl
-# t0 is the particle position at that time (but the particle already moved for ~11 months)
-# nt0 is the number of past positions for each particle I'm showing (to see filaments)
-
-# ╔═╡ 7d345828-4078-4273-a62e-9e5f5354591d
-begin
-	times=sort(unique(df.t))
-	t0=Observable(1)
-	nt0=2
-	🔴=@lift(filter(:t => x -> (x >= times[$t0])&&(x <=times[$t0+nt0-1] ), df))
-
-	lon=@lift($🔴.lon)
-	lat=@lift($🔴.lat)
-	vel=@lift(86400*sqrt.($🔴.dxdt.^2+$🔴.dydt.^2))
-	
-	options=(plot_type=:Oscar_plot,proj=proj,lon0=-160,add_background=true,add_polygons=true,
-			lon=lon,lat=lat,color=vel,colorrange=(0,2),colormap=:thermal,markersize=2)
-	J=DriftersDataset( data=(df=df,), options=options)
-	fig=plot(J)
-end
-
-# ╔═╡ 3acee516-d7cc-42ce-add8-9d3a3ec116a5
-begin
-	do_movie_bind = @bind do_movie CheckBox(default=false)
-	md""" Create animation ? $(do_movie_bind)"""
-end
-
-# ╔═╡ c187acd0-50a5-4360-ad13-73d658ebe87f
-# Animation
-if do_movie
-	# file_output_mp4=tempname()*".mp4"
-	file_output_mp4=joinpath("/Users/severinf/Figures/Oscar/","Drifters_2021.mp4")
-	record(fig, file_output_mp4, 1:length(times)-10, framerate = 25) do t
-    	t0[]=t
-	end
-	print(file_output_mp4)
-else
-	"skip animation"
-end
 
 # ╔═╡ 1aed4830-43dc-4d98-bcc0-775738a477c1
-md"""## Compute New Trajectories
+md"""## Precompute Trajectories into a CSV File
 
 !!! warning
-    This requires Oscar data to have been downloaded to the `input_path` folder.
+    Define input path (raw oscar files) and precomputed output file (csv file)
 """
 
-# ╔═╡ 714c83fd-d885-455b-b87a-2a0800446519
-begin
-	do_compute_bind = @bind do_compute CheckBox(default=false)
-	md""" Compute New Trajectories ? $(do_compute_bind)"""
-end
-
-# ╔═╡ a8ddb075-73cf-4496-a8a5-4f824a5f80d6
+# ╔═╡ 00fe44c0-c8e0-4505-8c83-c43a30ff7d0a
 begin
 	input_path="/Users/severinf/Data/raw/oscar/final"
-	input_files=Drifters.Oscar.list_files(input_path,2021)
-	input_files
+	input_files=Drifters.Oscar.list_files(input_path,202) #file 2020-2022
+	# output_file=tempname()*"_oscar.csv"
+	output_file=joinpath("/Users/severinf/Files_created/Drifters.jl/precomputed_oscar/","oscar_202x.csv")
+	println(input_files[1])
+	println(input_files[end])
+	println(output_file)
 end
 
-# ╔═╡ dd7f5d46-6479-4612-a6a4-2fedca50b1a8
-if do_compute && !isempty(input_files)
-	nt=30; output_file=tempname()*"_oscar.csv"
+# ╔═╡ 2da66098-418f-48e9-8c60-a7a4923099b3
+# n_part = nb initial particles 
+# reset_rate = reset per day
+# nt= nb of days from the beginning we do calculation
+# details is size (nt+1)*n_part
+
+# sometimes we have an error because one particle went out of the boundaries (1441), just rerun.
+if !isempty(input_files)
+	n_part=10000
+	reset_rate=0.05
+	# nt=730
+	nt=365
 
 	I=Drifters.Oscar.main_loop(input_files=input_files, do_save=true, output_file=output_file,
-			n_part=10000, reset_rate=0.05, nt=nt, verbose=true) #requires upcoming v0.6.6
+			n_part=n_part, reset_rate=reset_rate, nt=nt, verbose=true)
 
-	println(output_file)
 	println(Int.(round.(extrema(unique(I.🔴.t))./86400)))
 
 	O=(plot_type=:Oscar_plot,proj=proj,lon0=-160,add_background=true,
@@ -139,23 +66,57 @@ if do_compute && !isempty(input_files)
 	K=DriftersDataset( data=(df=I.🔴,), options=O);
 	"all set"
 else
-	O=(plot_type=:Oscar_plot,proj=proj,lon0=-160,add_background=true,
-		   add_polygons=true, markersize=2)
-	K=DriftersDataset( data=(df=df,), options=O)
-	"skip new trajectory calculations"
+	"input_files empty"
 end
 
-# ╔═╡ 317359d2-428b-48dc-933f-4ad6a874f7a6
-plot(K)
+# ╔═╡ 5e4f26a0-8954-44b7-a3cb-224197a2e0cb
+md"""## Visualize Precomputed Data
+
+- precomputed trajectory data are retrieved from a `csv` file.
+- the file contains daily time series of positions and normalized velocities.
+- virtual parcels were initially released the time varying Oscar flow fields.
+- the parcel trajectories were then computed using Drifters.jl (code provided below).
+"""
+
+# ╔═╡ 1dc43b12-c49f-4ab5-a239-9188d8452659
+df=CSV.read(output_file,DataFrame)
+
+# ╔═╡ 08ba0bfd-b6b1-436a-8a7c-5e5f394fc465
+begin
+	times=sort(unique(df.t)) # in days from beginning
+	tt=Observable(1) # particle position at that time seeded at the beginning of period (see csv file)
+	nt0=10 # number of following positions including tt I want to show for each particle (to see filaments)
+end
+
+# ╔═╡ 7d345828-4078-4273-a62e-9e5f5354591d
+begin
+	🔴=@lift(filter(:t => x -> (x >= times[$tt])&&(x <=times[$tt+nt0-1] ), df))
+
+	lon=@lift($🔴.lon)
+	lat=@lift($🔴.lat)
+	vel=@lift(86400*sqrt.($🔴.dxdt.^2+$🔴.dydt.^2))
+	date=@lift($🔴.t)
+	
+	options=(plot_type=:Oscar_plot,proj=proj,lon0=-160,add_background=true,add_polygons=true,
+			lon=lon,lat=lat,color=vel,colorrange=(0,2),colormap=:thermal,markersize=2)
+	J=DriftersDataset( data=(df=df,), options=options)
+	fig=plot(J)
+end
+
+# ╔═╡ 0845b7bf-2e77-4dde-a9a1-6d1ded585a01
+begin
+	file_output_mp4=joinpath("/Users/severinf/Figures/Oscar/","Drifters.mp4")
+	record(fig, file_output_mp4, 1:nt-10, framerate = 25) do t
+    	tt[]=t
+	end
+	print(file_output_mp4)
+end
 
 # ╔═╡ 24ecbc7b-b0f2-4ebe-9ac4-1a827254f225
 md"""## Appendix
 
 ### Julia Packages
 """
-
-# ╔═╡ 4a122475-11ab-4d1e-9ce6-c12148339430
-isdir(MeshArrays.GRID_LLC90) ? "all set for plotting" : "missing background data for plotting"
 
 # ╔═╡ 1f479c36-f021-464c-a279-0d62a1f33359
 md"""### Software : Drifters.jl ($(Pkg.pkgversion(Drifters)))
@@ -2554,9 +2515,9 @@ version = "0.1.6"
 
 [[deps.SciMLOperators]]
 deps = ["Accessors", "ArrayInterface", "DocStringExtensions", "LinearAlgebra", "MacroTools"]
-git-tree-sha1 = "d82853c515a8d9d42c1ab493a2687a37f1e26c91"
+git-tree-sha1 = "85608e4aaf758547ffc4030c908318b432114ec9"
 uuid = "c0aeaf25-5076-4817-a8d5-81caf7dfa961"
-version = "0.4.0"
+version = "1.3.0"
 weakdeps = ["SparseArrays", "StaticArraysCore"]
 
     [deps.SciMLOperators.extensions]
@@ -3133,23 +3094,16 @@ version = "3.6.0+0"
 
 # ╔═╡ Cell order:
 # ╟─39055364-6654-42dd-afad-9e67f286f054
-# ╟─e278df98-196b-4f05-a4e1-010b287d221f
-# ╟─5e4f26a0-8954-44b7-a3cb-224197a2e0cb
-# ╠═d6bd64ce-ebd3-11ef-3ea6-c77f6094d0a6
-# ╠═1dc43b12-c49f-4ab5-a239-9188d8452659
-# ╠═cc50a353-adb7-4f7c-a707-272045f3fb80
-# ╠═9824e0ef-5d69-49fc-a2cc-b41f010c8627
-# ╠═7d345828-4078-4273-a62e-9e5f5354591d
-# ╟─3acee516-d7cc-42ce-add8-9d3a3ec116a5
-# ╠═c187acd0-50a5-4360-ad13-73d658ebe87f
 # ╟─1aed4830-43dc-4d98-bcc0-775738a477c1
-# ╟─714c83fd-d885-455b-b87a-2a0800446519
-# ╠═a8ddb075-73cf-4496-a8a5-4f824a5f80d6
-# ╠═dd7f5d46-6479-4612-a6a4-2fedca50b1a8
-# ╠═317359d2-428b-48dc-933f-4ad6a874f7a6
+# ╠═00fe44c0-c8e0-4505-8c83-c43a30ff7d0a
+# ╠═2da66098-418f-48e9-8c60-a7a4923099b3
+# ╟─5e4f26a0-8954-44b7-a3cb-224197a2e0cb
+# ╠═1dc43b12-c49f-4ab5-a239-9188d8452659
+# ╠═08ba0bfd-b6b1-436a-8a7c-5e5f394fc465
+# ╠═7d345828-4078-4273-a62e-9e5f5354591d
+# ╠═0845b7bf-2e77-4dde-a9a1-6d1ded585a01
 # ╟─24ecbc7b-b0f2-4ebe-9ac4-1a827254f225
 # ╠═f1498618-07d5-4892-9028-dabf977bff9b
-# ╟─4a122475-11ab-4d1e-9ce6-c12148339430
-# ╟─1f479c36-f021-464c-a279-0d62a1f33359
+# ╠═1f479c36-f021-464c-a279-0d62a1f33359
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
